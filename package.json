@@ -1,0 +1,14 @@
+{
+  "name": "nodes",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/roberth26/nodes.git",
+  "author": "roberth26 <robbiehall26@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^16.2.0",
+    "react-redux": "^5.0.7",
+    "redux": "^3.7.2",
+    "styled-components": "^3.2.3"
+  }
+}
