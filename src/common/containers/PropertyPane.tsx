@@ -160,11 +160,6 @@ class PropertyPane extends React.Component<PropertyPaneProps> {
     }
 }
 
-const StyledPropertyPane = styled(PropertyPane)`
-    z-index: 10;
-    background-color: #252e35;
-`;
-
 const mapStateToProps = (state: State): Partial<PropertyPaneProps> => {
     const activeTool = state.tools.byId[state.tools.activeToolId];
 
@@ -185,7 +180,12 @@ const mapDispatchToProps = (dispatch): Partial<PropertyPaneProps> => ({
     onToolCreate: (toolName: string) => dispatch(toolCreationRequested(toolName))
 });
 
-export default connect(
+const PropertyPaneContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(StyledPropertyPane);
+)(PropertyPane);
+
+export default styled(PropertyPaneContainer)`
+    z-index: 10;
+    background-color: #252e35;
+`;

@@ -4,6 +4,12 @@
         "no-consecutive-blank-lines": true,
         "no-unused-variable": true,
         "indent": [true, "spaces", 4],
-        "import-name": false
+        "import-name": false,
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-pascal-case"
+        ]
     }
 }

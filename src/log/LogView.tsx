@@ -5,7 +5,7 @@ import JSONTree from 'react-json-tree';
 import { Action, State } from '../common';
 
 type LogViewProps = {
-    actions: Action[];
+    actions?: Action[]; // injected
 };
 
 const LogItem = styled.div`

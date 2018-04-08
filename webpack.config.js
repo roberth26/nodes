@@ -6,7 +6,7 @@ module.exports = {
 	entry: {
   		devServer: 'webpack-dev-server/client?http://0.0.0.0:3000',
 		hot: 'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
-		app: './index.tsx'
+		nodes: './index.tsx'
 	},
 	devtool: 'eval',
 	module: {
@@ -57,7 +57,12 @@ module.exports = {
 	                exclude: /(node_modules)/
 	            }
 	        }
-	    }),
+		}),
+		new webpack.DefinePlugin({
+			'process.env': {
+				NODE_ENV: JSON.stringify('development'),
+			},
+		}),
 	],
 	devServer: {
 		contentBase: path.resolve( __dirname, './dist' ),
@@ -67,7 +72,4 @@ module.exports = {
 		historyApiFallback: true,
 		port: 3000
 	},
-	node: {
-		fs: 'empty'
-	}
 };
