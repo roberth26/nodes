@@ -35,7 +35,6 @@
     "webpack-dev-server": "^3.1.1"
   },
   "scripts": {
-    "dev": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config=webpack.config.js --progress --profile --colors",
-    "build": "node ./node_modules/webpack/bin/webpack.js --config=webpack.config.js --progress --profile --colors"
+    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config=webpack.config.js --progress --profile --colors",
   }
 }
