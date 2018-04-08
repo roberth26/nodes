@@ -1,8 +1,9 @@
 {
-    "extends": ["tslint-config-airbnb", "tslint-config-prettier"],
+    "extends": ["tslint-config-airbnb", "tslint-react", "tslint-config-prettier"],
     "rules": {
         "no-consecutive-blank-lines": true,
         "no-unused-variable": true,
-        "indent": [true, "spaces", 4]
+        "indent": [true, "spaces", 4],
+        "import-name": false
     }
 }
