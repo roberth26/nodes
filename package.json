@@ -22,7 +22,7 @@
     "@types/react-redux": "^5.0.15",
     "@types/redux": "^3.6.0",
     "@types/redux-saga": "^0.10.5",
-    "awesome-typescript-loader": "^4.0.1",
+    "awesome-typescript-loader": "^5.0.0-1",
     "prettier": "^1.11.1",
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.8.0",
@@ -35,6 +35,6 @@
     "webpack-dev-server": "^3.1.1"
   },
   "scripts": {
-    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config=webpack.config.js --progress --profile --colors",
+    "start": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config=webpack.config.js --progress --profile --colors"
   }
 }

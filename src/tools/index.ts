@@ -1,15 +1,7 @@
 import './definitions/tool-add';
 import './definitions/tool-constant';
 
-export {
-    Tool,
-    ToolId,
-    State,
-    ToolMap,
-    ToolPosition,
-    Knob,
-    Type
-} from './types';
+export { Tool, ToolId, State, ToolHash, ToolPosition, Knob, Type } from './types';
 export {
     Action,
     ActionType,
@@ -25,7 +17,7 @@ export {
     toolInputConnectFailed,
     toolOutputConnectRequested,
     toolOutputConnectSucceeded,
-    toolOutputConnectFailed
+    toolOutputConnectFailed,
 } from './actions';
 export { rootSaga } from './sagas';
 export { initialState } from './constants';

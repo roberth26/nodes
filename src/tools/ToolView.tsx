@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Tool, ToolState } from './types';
+import { Tool, ToolEvaluationState } from './types';
 
 type ToolViewProps = {
     tool: Tool;
@@ -12,15 +12,12 @@ type ToolViewProps = {
 
 type WrapperProps = React.HTMLAttributes<HTMLElement> & {
     active: boolean;
-    state: ToolState;
+    state: ToolEvaluationState;
     customInnerRef: React.Ref<HTMLElement>;
 };
 
 const Wrapper: React.SFC<WrapperProps> = ({ active, customInnerRef, ...props }) => (
-    <section
-        ref={customInnerRef}
-        {...props}
-    />
+    <section ref={customInnerRef} {...props} />
 );
 
 const evaluationStrobing = keyframes`
@@ -37,17 +34,12 @@ const StyledWrapper = styled(Wrapper)`
     z-index: 10;
     width: 240px;
     border-radius: 3px;
-    border: 1px solid ${props => props.active ? 'red' : '#87b9f5'};
+    border: 1px solid ${props => (props.active ? 'red' : '#87b9f5')};
 
-    background-color: ${({ state }) => state === 'EVALUATED'
-        ? 'green'
-        : 'red'
-    };
+    background-color: ${({ state }) => (state === 'EVALUATED' ? 'green' : 'red')};
 
-    ${props => props.state === 'EVALUATING'
-        ? `animation: ${evaluationStrobing} .5s ease infinite`
-        : ''
-    };
+    ${props =>
+        props.state === 'EVALUATING' ? `animation: ${evaluationStrobing} .5s ease infinite` : ''};
 `;
 
 const Header = styled.header`
@@ -55,7 +47,7 @@ const Header = styled.header`
     align-items: center;
     justify-content: center;
     color: white;
-    background-color: rgba(255, 255, 255, .25);
+    background-color: rgba(255, 255, 255, 0.25);
     text-align: center;
     height: 30px;
 `;
@@ -70,7 +62,7 @@ const Input = styled.div`
 `;
 
 const InputType = styled.span`
-    opacity: .7;
+    opacity: 0.7;
 `;
 
 const InputTarget = styled.div`
@@ -82,13 +74,7 @@ const InputTarget = styled.div`
     margin-right: 8px;
 `;
 
-const ToolView: React.SFC<ToolViewProps> = ({
-    tool,
-    innerRef,
-    onDrag,
-    active,
-    onClick
-}) => (
+const ToolView: React.SFC<ToolViewProps> = ({ tool, innerRef, onDrag, active, onClick }) => (
     <StyledWrapper
         customInnerRef={innerRef}
         onDragEnd={onDrag}
@@ -98,7 +84,7 @@ const ToolView: React.SFC<ToolViewProps> = ({
         state={tool.state}
         style={{
             left: tool.position.x,
-            top: tool.position.y
+            top: tool.position.y,
         }}
     >
         <Header>
@@ -107,14 +93,16 @@ const ToolView: React.SFC<ToolViewProps> = ({
         </Header>
         {Object.keys(tool.inputs)
             .map(inputName => tool.inputs[inputName])
-            .map(input => input.toolIds.map((toolId, index, arr) => (
-                <Input key={`${input.name}${toolId}`}>
-                    <InputTarget />
-                    {input.name}{arr.length > 1  && ` [${index}]`}
-                    <InputType>:&nbsp;{input.type.toLowerCase()}</InputType>
-                </Input>
-            )))
-        }
+            .map(input =>
+                input.toolIds.map((toolId, index, arr) => (
+                    <Input key={`${input.name}${toolId}`}>
+                        <InputTarget />
+                        {input.name}
+                        {arr.length > 1 && ` [${index}]`}
+                        <InputType>:&nbsp;{input.type.toLowerCase()}</InputType>
+                    </Input>
+                ))
+            )}
     </StyledWrapper>
 );
 

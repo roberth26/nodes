@@ -12,7 +12,7 @@ import {
     getActiveToolKnobs,
     allToolsEvaluationRequested,
     Registry,
-    toolCreationRequested
+    toolCreationRequested,
 } from '../../tools';
 
 type PropertyPaneProps = React.HTMLAttributes<HTMLElement> & {
@@ -20,11 +20,7 @@ type PropertyPaneProps = React.HTMLAttributes<HTMLElement> & {
     onToolLabelChange: (toolId: ToolId, name: string) => void;
     onEvaluateAllToolsRequest: () => void;
     knobs: Knob[];
-    onKnobChange: (
-        toolId: ToolId,
-        knobName: string,
-        knobValue: Type
-    ) => void;
+    onKnobChange: (toolId: ToolId, knobName: string, knobValue: Type) => void;
     onToolCreate: (toolName: string) => void;
 };
 
@@ -97,7 +93,7 @@ class PropertyPane extends React.Component<PropertyPaneProps> {
     };
 
     render() {
-        const{
+        const {
             children,
             activeTool,
             onToolLabelChange,
@@ -111,16 +107,11 @@ class PropertyPane extends React.Component<PropertyPaneProps> {
         return (
             <aside {...props}>
                 {activeTool != null && (
-                    <ToolName
-                        value={activeTool.label}
-                        onChange={this.handleToolLabelChange}
-                    />
+                    <ToolName value={activeTool.label} onChange={this.handleToolLabelChange} />
                 )}
                 {knobs.map(knob => (
                     <KnobWrapper key={knob.name}>
-                        <label htmlFor={knob.name}>
-                            {knob.name}
-                        </label>
+                        <label htmlFor={knob.name}>{knob.name}</label>
                         {(() => {
                             switch (knob.type) {
                                 case 'NUMBER':
@@ -139,20 +130,10 @@ class PropertyPane extends React.Component<PropertyPaneProps> {
                     </KnobWrapper>
                 ))}
                 <button onClick={this.handleEvaluateAllToolsClick}>Evaluate All</button>
-                <select
-                    onChange={this.handleCreateToolChange}
-                    value={''}
-                >
-                    <option
-                        value={''}
-                        children={'Create Tool'}
-                    />
+                <select onChange={this.handleCreateToolChange} value={''}>
+                    <option value={''} children={'Create Tool'} />
                     {Registry.getToolNames().map(toolName => (
-                        <option
-                            key={toolName}
-                            value={toolName}
-                            children={toolName}
-                        />
+                        <option key={toolName} value={toolName} children={toolName} />
                     ))}
                 </select>
             </aside>
@@ -165,25 +146,20 @@ const mapStateToProps = (state: State): Partial<PropertyPaneProps> => {
 
     return {
         activeTool,
-        knobs: getActiveToolKnobs(state.tools)
+        knobs: getActiveToolKnobs(state.tools),
     };
 };
 
 const mapDispatchToProps = (dispatch): Partial<PropertyPaneProps> => ({
-    onToolLabelChange: (toolId: ToolId, toolName: string) => dispatch(toolLabelChanged(toolId, toolName)),
-    onKnobChange: (
-        toolId: ToolId,
-        knobName: string,
-        knobValue: Type
-    ) => dispatch(knobChanged(toolId, knobName, knobValue)),
+    onToolLabelChange: (toolId: ToolId, toolName: string) =>
+        dispatch(toolLabelChanged(toolId, toolName)),
+    onKnobChange: (toolId: ToolId, knobName: string, knobValue: Type) =>
+        dispatch(knobChanged(toolId, knobName, knobValue)),
     onEvaluateAllToolsRequest: () => dispatch(allToolsEvaluationRequested()),
-    onToolCreate: (toolName: string) => dispatch(toolCreationRequested(toolName))
+    onToolCreate: (toolName: string) => dispatch(toolCreationRequested(toolName)),
 });
 
-const PropertyPaneContainer = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(PropertyPane);
+const PropertyPaneContainer = connect(mapStateToProps, mapDispatchToProps)(PropertyPane);
 
 export default styled(PropertyPaneContainer)`
     z-index: 10;

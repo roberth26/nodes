@@ -1,4 +1,15 @@
-import { select, call, put, all, fork, takeLatest, takeEvery } from 'redux-saga/effects';
+import {
+    select,
+    call,
+    put,
+    all,
+    fork,
+    takeLatest,
+    takeEvery,
+    SelectEffect,
+    CallEffect,
+    PutEffect,
+} from 'redux-saga/effects';
 import { State } from '../common';
 import {
     AllToolsEvaluationRequested,
@@ -8,60 +19,47 @@ import {
     toolEvaluationPending,
     KnobChanged,
     ToolCreationRequested,
-    toolCreated
+    toolCreated,
+    ToolEvaluationCompleted,
 } from './actions';
-import { Tool, ToolMap } from './types';
+import { Tool, ToolHash, ToolId, Type } from './types';
 import Registry from './Registry';
 
-const getRoots = (tool: Tool, toolMap: ToolMap): Tool[] => {
-    if (!tool.outputs || tool.outputs.length === 0) {
-        return [tool];
+const evaluateTool = function*(
+    tool: Tool
+): IterableIterator<SelectEffect | CallEffect | PutEffect<ToolEvaluationCompleted>> {
+    const { id: toolId, name: toolName, inputs: toolInputHash, knobs: toolKnobHash } = tool;
+    const { tools: { byId: toolsHash } }: State = yield select();
+    const inputToolIds = Array.from(
+        new Set(
+            Object.keys(toolInputHash)
+                .map(inputName => toolInputHash[inputName].toolIds)
+                .reduce((acc, curr) => acc.concat(curr), [])
+        )
+    ).filter(inputToolId => toolsHash[inputToolId].state === 'PENDING');
+
+    for (let i = 0; i < inputToolIds.length; i += 1) {
+        const inputToolId = inputToolIds[i];
+        const value = yield call(evaluateTool, toolsHash[inputToolId], toolId => toolsHash[toolId]);
+        toolsHash[inputToolId].value = value;
     }
 
-    return [].concat(...tool.outputs.map(outputToolId => getRoots(toolMap[outputToolId], toolMap)));
-};
-
-function* evaluateTool(tool: Tool) {
-    const {
-        id: toolId,
-        name: toolName,
-        inputs: toolInputMap,
-        knobs: toolKnobMap
-    } = tool;
-
-    const { tools }: State = yield select();
-    const { byId } = tools;
-    const inputToolEvaluationTaskMap = [].concat(...Object.keys(toolInputMap)
-        .map(inputName => toolInputMap[inputName].toolIds))
-        .reduce((map, inputToolId) => ({
-            ...map,
-            [inputToolId]: call(evaluateTool, tools.byId[inputToolId])
-        }), {});
- 
-    yield all(inputToolEvaluationTaskMap);
-
     const implementation = Registry.getToolImplementation(toolName);
-
-    const value = yield call(
-        implementation,
-        toolInputMap,
-        toolKnobMap,
-        byId
-    );
-
+    const value = yield call(implementation, toolInputHash, toolKnobHash, toolsHash);
     yield put(toolEvaluationCompleted(toolId, value));
 
     return value;
-}
+};
 
 function* handleAllToolsEvaluationRequested(action: AllToolsEvaluationRequested) {
-    const { tools }: State = yield select();
+    const { tools: { byId: toolsHash } }: State = yield select();
 
-    const rootTools = [].concat(...Object.keys(tools.byId)
-        .map(toolId => getRoots(tools.byId[toolId], tools.byId)));
-    const rootToolsSet = new Set(rootTools);
-    const rootToolsArray = Array.from(rootToolsSet);
-    const rootToolEvaluationTasks = rootToolsArray.map(tool => fork(evaluateTool, tool))
+    yield all(Object.keys(toolsHash).map(toolId => put(toolEvaluationPending(toolId))));
+
+    const rootTools = Object.keys(toolsHash)
+        .map(toolId => toolsHash[toolId])
+        .filter(tool => tool.outputs == null || tool.outputs.length === 0);
+    const rootToolEvaluationTasks = rootTools.map(tool => fork(evaluateTool, tool));
 
     yield all(rootToolEvaluationTasks);
 }
@@ -70,10 +68,32 @@ function* watchAllToolsEvaluationRequested() {
     yield takeLatest(ActionType.ALL_TOOLS_EVALUATION_REQUESTED, handleAllToolsEvaluationRequested);
 }
 
+const getDescendants = (toolId: ToolId, getTool: (toolId: ToolId) => Tool): Tool[] => {
+    const tool = getTool(toolId);
+
+    if (!tool.outputs || tool.outputs.length === 0) {
+        return [tool];
+    }
+
+    return Array.from(
+        new Set(
+            [tool].concat(
+                tool.outputs
+                    .map(outputToolId => getDescendants(outputToolId, getTool))
+                    .reduce((acc, curr) => acc.concat(curr), [])
+            )
+        )
+    );
+};
+
 function* handleKnobChanged({ toolId, knobName, knobValue }: KnobChanged) {
-    const { tools }: State = yield select();
-    yield put(toolEvaluationPending(toolId));
-    yield call(evaluateTool, tools.byId[toolId]);
+    const { tools: { byId: toolsHash } }: State = yield select();
+    const descendants = getDescendants(toolId, toolId => toolsHash[toolId]);
+    yield all(descendants.map(({ id }) => put(toolEvaluationPending(id))));
+    const rootDescendants = descendants.filter(
+        ({ outputs }) => outputs == null || outputs.length === 0
+    );
+    yield all(rootDescendants.map(tool => fork(evaluateTool, tool)));
 }
 
 function* watchKnobChanged() {
@@ -85,7 +105,7 @@ function* handleToolCreationRequested(action: ToolCreationRequested) {
 
     const tool = Registry.createToolInstance(toolName);
     yield put(toolCreated(tool));
-};
+}
 
 function* watchToolCreationRequested() {
     yield takeEvery(ActionType.TOOL_CREATION_REQUESTED, handleToolCreationRequested);
@@ -95,6 +115,6 @@ export function* rootSaga() {
     yield all([
         fork(watchAllToolsEvaluationRequested),
         fork(watchKnobChanged),
-        fork(watchToolCreationRequested)
+        fork(watchToolCreationRequested),
     ]);
 }

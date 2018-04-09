@@ -8,7 +8,6 @@ module.exports = {
 		hot: 'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
 		nodes: './index.tsx'
 	},
-	devtool: 'eval',
 	module: {
 		rules: [
 			{
@@ -71,5 +70,5 @@ module.exports = {
 		stats: 'errors-only',
 		historyApiFallback: true,
 		port: 3000
-	},
+	}
 };

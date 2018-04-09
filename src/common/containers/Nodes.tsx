@@ -4,21 +4,21 @@ import styled from 'styled-components';
 import PanelGroup from 'react-panelgroup';
 import { State } from '../types';
 import {
-    ToolMap,
+    ToolHash,
     getToolsAsArray,
     Tool,
     ToolId,
     ToolView,
     ToolPosition,
     toolMoved,
-    toolSelected
+    toolSelected,
 } from '../../tools';
 import PropertyPane from './PropertyPane';
 import { LogView } from '../../log';
 
 type NodesProps = {
     activeTool: Tool;
-    tools: ToolMap;
+    tools: ToolHash;
     onToolMove: (toolId: ToolId, toolPosition: ToolPosition) => void;
     onToolSelect: (toolId: ToolId) => void;
 };
@@ -75,7 +75,7 @@ class Nodes extends React.Component<NodesProps> {
     handleCanvasRef = element => {
         this.canvasElement = element;
         this.forceUpdate();
-    }
+    };
 
     createHandleToolViewRef = (toolId: ToolId) => (element: HTMLElement) => {
         if (element) {
@@ -113,51 +113,45 @@ class Nodes extends React.Component<NodesProps> {
         ctx.clearRect(0, 0, clientWidth, clientHeight);
         ctx.strokeStyle = 'lightgrey';
 
-        Array.from(this.toolIdToElementMap)
-            .forEach(([toolId, toolElement]) => {
-                const { inputs } = tools[toolId];
+        Array.from(this.toolIdToElementMap).forEach(([toolId, toolElement]) => {
+            const { inputs } = tools[toolId];
 
-                const {
-                    top,
-                    left,
-                    width,
-                    height
-                } = toolElement.getBoundingClientRect();
+            const { top, left, width, height } = toolElement.getBoundingClientRect();
 
-                Object.keys(inputs)
-                    .map(inputName => inputs[inputName])
-                    .forEach(inputTool => {
-                        inputTool.toolIds.forEach(toolId => {
-                            const inputToolElement = this.toolIdToElementMap.get(toolId);
+            Object.keys(inputs)
+                .map(inputName => inputs[inputName])
+                .forEach(inputTool => {
+                    inputTool.toolIds.forEach(toolId => {
+                        const inputToolElement = this.toolIdToElementMap.get(toolId);
 
-                            const {
-                                top: inputTop,
-                                left: inputLeft,
-                                width: inputWidth,
-                                height: inputHeight
-                            } = inputToolElement.getBoundingClientRect();
+                        const {
+                            top: inputTop,
+                            left: inputLeft,
+                            width: inputWidth,
+                            height: inputHeight,
+                        } = inputToolElement.getBoundingClientRect();
 
-                            const startX = inputLeft + inputWidth;
-                            const startY = inputTop + inputHeight / 2;
-                            const endX = left;
-                            const endY = top + height / 2;
-                            const deltaX = endX - startX;
-                            const deltaY = endY - startY;
-    
-                            ctx.beginPath();
-                            ctx.moveTo(startX, startY);
-                            ctx.bezierCurveTo(
-                                startX + deltaX / 2,
-                                startY,
-                                endX - deltaX / 2,
-                                endY,
-                                endX,
-                                endY
-                            );
-                            ctx.stroke();
-                        });
+                        const startX = inputLeft + inputWidth;
+                        const startY = inputTop + inputHeight / 2;
+                        const endX = left;
+                        const endY = top + height / 2;
+                        const deltaX = endX - startX;
+                        const deltaY = endY - startY;
+
+                        ctx.beginPath();
+                        ctx.moveTo(startX, startY);
+                        ctx.bezierCurveTo(
+                            startX + deltaX / 2,
+                            startY,
+                            endX - deltaX / 2,
+                            endY,
+                            endX,
+                            endY
+                        );
+                        ctx.stroke();
                     });
-            });
+                });
+        });
     }
 
     render() {
@@ -170,8 +164,8 @@ class Nodes extends React.Component<NodesProps> {
                     panelWidths={[
                         {},
                         {
-                            size: 300
-                        }
+                            size: 300,
+                        },
                     ]}
                 >
                     <PanelGroup
@@ -180,16 +174,22 @@ class Nodes extends React.Component<NodesProps> {
                         panelWidths={[
                             {},
                             {
-                                size: 300
-                            }
+                                size: 300,
+                            },
                         ]}
                     >
                         <ViewportWrapper>
                             <Viewport>
                                 <Canvas
                                     innerRef={this.handleCanvasRef}
-                                    width={(this.canvasElement && this.canvasElement.clientWidth) || 600}
-                                    height={(this.canvasElement && this.canvasElement.clientHeight) || 600}
+                                    width={
+                                        (this.canvasElement && this.canvasElement.clientWidth) ||
+                                        600
+                                    }
+                                    height={
+                                        (this.canvasElement && this.canvasElement.clientHeight) ||
+                                        600
+                                    }
                                 />
                                 {Object.keys(tools)
                                     .map(toolId => tools[toolId])
@@ -202,8 +202,7 @@ class Nodes extends React.Component<NodesProps> {
                                             active={activeTool && activeTool.id === tool.id}
                                             onClick={this.createHandleToolViewClick(tool.id)}
                                         />
-                                    ))
-                                }
+                                    ))}
                             </Viewport>
                         </ViewportWrapper>
                         <LogView />
@@ -217,15 +216,13 @@ class Nodes extends React.Component<NodesProps> {
 
 const mapStateToProps = (state: State): Partial<NodesProps> => ({
     tools: state.tools.byId,
-    activeTool: state.tools.byId[state.tools.activeToolId]
+    activeTool: state.tools.byId[state.tools.activeToolId],
 });
 
 const mapDispatchToProps = (dispatch): Partial<NodesProps> => ({
-    onToolMove: (toolId: ToolId, toolPosition: ToolPosition) => dispatch(toolMoved(toolId, toolPosition)),
-    onToolSelect: (toolId: ToolId) => dispatch(toolSelected(toolId))
+    onToolMove: (toolId: ToolId, toolPosition: ToolPosition) =>
+        dispatch(toolMoved(toolId, toolPosition)),
+    onToolSelect: (toolId: ToolId) => dispatch(toolSelected(toolId)),
 });
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Nodes);
+export default connect(mapStateToProps, mapDispatchToProps)(Nodes);

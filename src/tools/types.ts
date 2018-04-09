@@ -24,7 +24,7 @@ export type Knob = TypedKnob & {
     name: string;
 };
 
-export type KnobMap = {
+export type KnobHash = {
     [knobName: string]: Knob;
 };
 
@@ -34,40 +34,44 @@ export type ToolPosition = {
     y: number;
 };
 export type ToolValue = Type;
-export type ToolState = 'PENDING' | 'EVALUATING' | 'EVALUATED';
+export type ToolEvaluationState = 'PENDING' | 'EVALUATING' | 'EVALUATED';
 export type InputGroup = {
     name: string;
     toolIds: ToolId[];
     variadic: boolean;
     type: TypeString;
 };
-export type InputMap = {
-    [inputGroupName: string]: InputGroup
+export type InputHash = {
+    [inputGroupName: string]: InputGroup;
 };
 
 export type Tool = {
     id: ToolId;
     name: string;
     label: string;
-    state: ToolState;
-    inputs: InputMap;
-    knobs: KnobMap;
+    state: ToolEvaluationState;
+    inputs: InputHash;
+    knobs: KnobHash;
     outputs: ToolId[];
     position: ToolPosition;
     value: ToolValue;
     outputType: TypeString;
 };
 
-export type ToolMap = {
+export type ToolHash = {
     [toolId: string]: Tool;
 };
 
 export type State = {
     activeToolId: ToolId;
-    byId: ToolMap;
+    byId: ToolHash;
 };
 
-export type ToolImplementation = (inputs?: InputMap, knobs?: KnobMap, toolMap?: ToolMap) => Type | Promise<Type>;
+export type ToolImplementation = (
+    inputs?: InputHash,
+    knobs?: KnobHash,
+    toolMap?: ToolHash
+) => Type | Promise<Type>;
 
 export type ToolFactory = () => Partial<Tool> & {
     name: string;

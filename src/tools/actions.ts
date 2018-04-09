@@ -1,21 +1,21 @@
 import { ToolId, ToolValue, ToolPosition, Type, Tool } from './types';
 
 export type Action =
-    AllToolsEvaluationRequested |
-    ToolEvaluationCompleted |
-    ToolEvaluationPending |
-    ToolMoved |
-    ToolSelected |
-    ToolLabelChanged |
-    KnobChanged |
-    ToolCreationRequested |
-    ToolCreated |
-    ToolInputConnectRequested |
-    ToolInputConnectSucceeded |
-    ToolInputConnectFailed |
-    ToolOutputConnectRequested |
-    ToolOutputConnectSucceeded |
-    ToolOutputConnectFailed;
+    | AllToolsEvaluationRequested
+    | ToolEvaluationCompleted
+    | ToolEvaluationPending
+    | ToolMoved
+    | ToolSelected
+    | ToolLabelChanged
+    | KnobChanged
+    | ToolCreationRequested
+    | ToolCreated
+    | ToolInputConnectRequested
+    | ToolInputConnectSucceeded
+    | ToolInputConnectFailed
+    | ToolOutputConnectRequested
+    | ToolOutputConnectSucceeded
+    | ToolOutputConnectFailed;
 
 export enum ActionType {
     ALL_TOOLS_EVALUATION_REQUESTED = 'ALL_TOOLS_EVALUATION_REQUESTED',
@@ -32,11 +32,11 @@ export enum ActionType {
     TOOL_INPUT_CONNECT_FAILED = 'TOOL_INPUT_CONNECT_FAILED',
     TOOL_OUTPUT_CONNECT_REQUESTED = 'TOOL_OUTPUT_CONNECT_REQUESTED',
     TOOL_OUTPUT_CONNECT_SUCCEEDED = 'TOOL_OUTPUT_CONNECT_SUCCEEDED',
-    TOOL_OUTPUT_CONNECT_FAILED = 'TOOL_OUTPUT_CONNECT_FAILED'
+    TOOL_OUTPUT_CONNECT_FAILED = 'TOOL_OUTPUT_CONNECT_FAILED',
 }
 
 export type AllToolsEvaluationRequested = {
-    type: ActionType.ALL_TOOLS_EVALUATION_REQUESTED
+    type: ActionType.ALL_TOOLS_EVALUATION_REQUESTED;
 };
 export type ToolEvaluationCompleted = {
     type: ActionType.TOOL_EVALUATION_COMPLETED;
@@ -115,44 +115,47 @@ export type ToolOutputConnectFailed = {
 };
 
 export const allToolsEvaluationRequested = (): AllToolsEvaluationRequested => ({
-    type: ActionType.ALL_TOOLS_EVALUATION_REQUESTED
+    type: ActionType.ALL_TOOLS_EVALUATION_REQUESTED,
 });
-export const toolEvaluationCompleted = (toolId: ToolId, toolValue: ToolValue): ToolEvaluationCompleted => ({
+export const toolEvaluationCompleted = (
+    toolId: ToolId,
+    toolValue: ToolValue
+): ToolEvaluationCompleted => ({
     toolId,
     toolValue,
-    type: ActionType.TOOL_EVALUATION_COMPLETED
+    type: ActionType.TOOL_EVALUATION_COMPLETED,
 });
 export const toolEvaluationPending = (toolId: ToolId): ToolEvaluationPending => ({
     toolId,
-    type: ActionType.TOOL_EVALUATION_PENDING
+    type: ActionType.TOOL_EVALUATION_PENDING,
 });
 export const toolMoved = (toolId: ToolId, toolPosition: ToolPosition): ToolMoved => ({
     toolId,
     toolPosition,
-    type: ActionType.TOOL_MOVED
+    type: ActionType.TOOL_MOVED,
 });
 export const toolSelected = (toolId: ToolId): ToolSelected => ({
     toolId,
-    type: ActionType.TOOL_SELECTED
+    type: ActionType.TOOL_SELECTED,
 });
 export const toolLabelChanged = (toolId: ToolId, label: string): ToolLabelChanged => ({
     toolId,
     label,
-    type: ActionType.TOOL_LABEL_CHANGED
+    type: ActionType.TOOL_LABEL_CHANGED,
 });
 export const knobChanged = (toolId: ToolId, knobName: string, knobValue: Type): KnobChanged => ({
     toolId,
     knobName,
     knobValue,
-    type: ActionType.KNOB_CHANGED
+    type: ActionType.KNOB_CHANGED,
 });
 export const toolCreationRequested = (toolName: string): ToolCreationRequested => ({
     toolName,
-    type: ActionType.TOOL_CREATION_REQUESTED
+    type: ActionType.TOOL_CREATION_REQUESTED,
 });
 export const toolCreated = (tool: Tool): ToolCreated => ({
     tool,
-    type: ActionType.TOOL_CREATED
+    type: ActionType.TOOL_CREATED,
 });
 export const toolInputConnectRequested = (
     toolId: ToolId,
@@ -162,7 +165,7 @@ export const toolInputConnectRequested = (
     toolId,
     inputName,
     upstreamToolId,
-    type: ActionType.TOOL_INPUT_CONNECT_REQUESTED
+    type: ActionType.TOOL_INPUT_CONNECT_REQUESTED,
 });
 export const toolInputConnectSucceeded = (
     toolId: ToolId,
@@ -172,7 +175,7 @@ export const toolInputConnectSucceeded = (
     toolId,
     inputName,
     upstreamToolId,
-    type: ActionType.TOOL_INPUT_CONNECT_SUCCEEDED
+    type: ActionType.TOOL_INPUT_CONNECT_SUCCEEDED,
 });
 export const toolInputConnectFailed = (
     toolId: ToolId,
@@ -184,7 +187,7 @@ export const toolInputConnectFailed = (
     inputName,
     upstreamToolId,
     error,
-    type: ActionType.TOOL_INPUT_CONNECT_FAILED
+    type: ActionType.TOOL_INPUT_CONNECT_FAILED,
 });
 export const toolOutputConnectRequested = (
     toolId: ToolId,
@@ -194,7 +197,7 @@ export const toolOutputConnectRequested = (
     toolId,
     downstreamToolId,
     downstreamInputName,
-    type: ActionType.TOOL_OUTPUT_CONNECT_REQUESTED
+    type: ActionType.TOOL_OUTPUT_CONNECT_REQUESTED,
 });
 export const toolOutputConnectSucceeded = (
     toolId: ToolId,
@@ -204,7 +207,7 @@ export const toolOutputConnectSucceeded = (
     toolId,
     downstreamToolId,
     downstreamInputName,
-    type: ActionType.TOOL_OUTPUT_CONNECT_SUCCEEDED
+    type: ActionType.TOOL_OUTPUT_CONNECT_SUCCEEDED,
 });
 export const toolOutputConnectFailed = (
     toolId: ToolId,
@@ -216,5 +219,5 @@ export const toolOutputConnectFailed = (
     downstreamToolId,
     downstreamInputName,
     error,
-    type: ActionType.TOOL_OUTPUT_CONNECT_FAILED
+    type: ActionType.TOOL_OUTPUT_CONNECT_FAILED,
 });
