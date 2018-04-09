@@ -1,5 +1,6 @@
 import './definitions/tool-add';
 import './definitions/tool-constant';
+import './definitions/tool-defer';
 
 export { Tool, ToolId, State, ToolHash, ToolPosition, Knob, Type } from './types';
 export {

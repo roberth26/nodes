@@ -55,13 +55,41 @@ const initialState: State = {
                 value: null,
                 outputType: 'NUMBER',
             },
+            g: {
+                id: 'g',
+                name: 'DEFER',
+                label: 'defer',
+                state: 'PENDING',
+                inputs: {
+                    input: {
+                        name: 'input',
+                        toolIds: ['b'],
+                        type: 'NUMBER',
+                        variadic: false,
+                    },
+                },
+                outputs: ['c'],
+                knobs: {
+                    timeout: {
+                        name: 'timeout',
+                        type: 'NUMBER',
+                        value: 300,
+                    },
+                },
+                position: {
+                    x: 350,
+                    y: 200,
+                },
+                value: null,
+                outputType: 'NUMBER',
+            },
             b: {
                 id: 'b',
                 name: 'CONSTANT',
                 label: 'constant 2',
                 state: 'PENDING',
                 inputs: {},
-                outputs: ['c'],
+                outputs: ['g'],
                 knobs: {
                     value: {
                         name: 'value',
@@ -84,7 +112,7 @@ const initialState: State = {
                 inputs: {
                     operand: {
                         name: 'operand',
-                        toolIds: ['a', 'b'],
+                        toolIds: ['a', 'g'],
                         type: 'NUMBER',
                         variadic: true,
                     },
@@ -92,7 +120,7 @@ const initialState: State = {
                 outputs: ['f'],
                 knobs: {},
                 position: {
-                    x: 400,
+                    x: 700,
                     y: 120,
                 },
                 value: null,
@@ -113,7 +141,7 @@ const initialState: State = {
                     },
                 },
                 position: {
-                    x: 400,
+                    x: 700,
                     y: 50,
                 },
                 value: null,
@@ -134,7 +162,7 @@ const initialState: State = {
                     },
                 },
                 position: {
-                    x: 400,
+                    x: 700,
                     y: 250,
                 },
                 value: null,
@@ -156,7 +184,7 @@ const initialState: State = {
                 outputs: [],
                 knobs: {},
                 position: {
-                    x: 750,
+                    x: 1100,
                     y: 100,
                 },
                 value: null,

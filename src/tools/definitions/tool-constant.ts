@@ -10,18 +10,16 @@ const factory: ToolFactory = () => ({
         value: {
             value: 50,
             name: 'value',
-            type: 'NUMBER'
-        } as Knob
-    }
+            type: 'NUMBER',
+        },
+    },
 });
 
 const implementation: ToolImplementation = (inputs, knobs, toolMap) => {
     const { value: valueKnob } = knobs;
     const { value } = valueKnob;
 
-    return new Promise(r => {
-        setTimeout(() => r(value), 1500);
-    });
+    return value;
 };
 
 Registry.register(name, factory, implementation);
