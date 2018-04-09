@@ -12,6 +12,7 @@ import {
     ToolPosition,
     toolMoved,
     toolSelected,
+    InputRef,
 } from '../../tools';
 import PropertyPane from './PropertyPane';
 import { LogView } from '../../log';
@@ -61,16 +62,13 @@ const Layout = styled.div`
 const Canvas = styled.canvas`
     position: absolute;
     top: 0;
-    right: 0;
-    bottom: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
 `;
 
 class Nodes extends React.Component<NodesProps> {
     canvasElement: HTMLCanvasElement;
     toolIdToElementMap = new Map<ToolId, HTMLElement>();
+    inputRefsHash: { [toolId: string]: InputRef[] } = {};
 
     handleCanvasRef = element => {
         this.canvasElement = element;
@@ -104,7 +102,7 @@ class Nodes extends React.Component<NodesProps> {
         }
     };
 
-    componentDidUpdate() {
+    drawLines = () => {
         const { tools } = this.props;
 
         const ctx = this.canvasElement.getContext('2d');
@@ -116,13 +114,11 @@ class Nodes extends React.Component<NodesProps> {
         Array.from(this.toolIdToElementMap).forEach(([toolId, toolElement]) => {
             const { inputs } = tools[toolId];
 
-            const { top, left, width, height } = toolElement.getBoundingClientRect();
-
             Object.keys(inputs)
                 .map(inputName => inputs[inputName])
-                .forEach(inputTool => {
-                    inputTool.toolIds.forEach(toolId => {
-                        const inputToolElement = this.toolIdToElementMap.get(toolId);
+                .forEach(input => {
+                    input.toolIds.forEach(inputToolId => {
+                        const inputToolElement = this.toolIdToElementMap.get(inputToolId);
 
                         const {
                             top: inputTop,
@@ -133,25 +129,50 @@ class Nodes extends React.Component<NodesProps> {
 
                         const startX = inputLeft + inputWidth;
                         const startY = inputTop + inputHeight / 2;
-                        const endX = left;
-                        const endY = top + height / 2;
-                        const deltaX = endX - startX;
-                        const deltaY = endY - startY;
 
-                        ctx.beginPath();
-                        ctx.moveTo(startX, startY);
-                        ctx.bezierCurveTo(
-                            startX + deltaX / 2,
-                            startY,
-                            endX - deltaX / 2,
-                            endY,
-                            endX,
-                            endY
-                        );
-                        ctx.stroke();
+                        this.inputRefsHash[toolId]
+                            .filter(inputRef => inputRef.toolId === inputToolId)
+                            .forEach(inputRef => {
+                                console.log(`line from ${inputToolId} to ${toolId}`);
+
+                                const {
+                                    top,
+                                    left,
+                                    height,
+                                } = inputRef.element.getBoundingClientRect();
+                                const endX = left;
+                                const endY = top + height / 2;
+                                const deltaX = endX - startX;
+                                const deltaY = endY - startY;
+
+                                ctx.beginPath();
+                                ctx.moveTo(startX, startY);
+                                ctx.bezierCurveTo(
+                                    startX + deltaX / 2,
+                                    startY,
+                                    endX - deltaX / 2,
+                                    endY,
+                                    endX,
+                                    endY
+                                );
+                                ctx.stroke();
+                            });
                     });
                 });
         });
+    };
+
+    componentDidUpdate() {
+        this.drawLines();
+    }
+
+    componentDidMount() {
+        this.drawLines();
+        window.addEventListener('resize', this.drawLines);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.drawLines);
     }
 
     render() {
@@ -182,14 +203,8 @@ class Nodes extends React.Component<NodesProps> {
                             <Viewport>
                                 <Canvas
                                     innerRef={this.handleCanvasRef}
-                                    width={
-                                        (this.canvasElement && this.canvasElement.clientWidth) ||
-                                        600
-                                    }
-                                    height={
-                                        (this.canvasElement && this.canvasElement.clientHeight) ||
-                                        600
-                                    }
+                                    width={2000}
+                                    height={2000}
                                 />
                                 {Object.keys(tools)
                                     .map(toolId => tools[toolId])
@@ -201,6 +216,9 @@ class Nodes extends React.Component<NodesProps> {
                                             onDrag={this.createHandleToolViewDrag(tool.id)}
                                             active={activeTool && activeTool.id === tool.id}
                                             onClick={this.createHandleToolViewClick(tool.id)}
+                                            inputRefs={inputRefs =>
+                                                (this.inputRefsHash[tool.id] = inputRefs)
+                                            }
                                         />
                                     ))}
                             </Viewport>

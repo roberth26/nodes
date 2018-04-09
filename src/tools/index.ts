@@ -23,5 +23,5 @@ export { rootSaga } from './sagas';
 export { initialState } from './constants';
 export { reducer } from './reducers';
 export { getToolsAsArray, getActiveToolKnobs } from './selectors';
-export { default as ToolView } from './ToolView';
+export { default as ToolView, InputRef } from './ToolView';
 export { default as Registry } from './Registry';

@@ -8,6 +8,7 @@ type ToolViewProps = {
     onDrag: (event: React.DragEvent<HTMLElement>) => void;
     active: boolean;
     onClick: (event: React.MouseEvent<HTMLElement>) => void;
+    inputRefs: (refs: InputRef[]) => void;
 };
 
 type WrapperProps = React.HTMLAttributes<HTMLElement> & {
@@ -74,36 +75,60 @@ const InputTarget = styled.div`
     margin-right: 8px;
 `;
 
-const ToolView: React.SFC<ToolViewProps> = ({ tool, innerRef, onDrag, active, onClick }) => (
-    <StyledWrapper
-        customInnerRef={innerRef}
-        onDragEnd={onDrag}
-        draggable={true}
-        active={active}
-        onClick={onClick}
-        state={tool.state}
-        style={{
-            left: tool.position.x,
-            top: tool.position.y,
-        }}
-    >
-        <Header>
-            <span>{tool.label}</span>
-            {tool.value != null && <span>&nbsp;[{tool.value}]</span>}
-        </Header>
-        {Object.keys(tool.inputs)
-            .map(inputName => tool.inputs[inputName])
-            .map(input =>
-                input.toolIds.map((toolId, index, arr) => (
-                    <Input key={`${input.name}${toolId}`}>
-                        <InputTarget />
-                        {input.name}
-                        {arr.length > 1 && ` [${index}]`}
-                        <InputType>:&nbsp;{input.type.toLowerCase()}</InputType>
-                    </Input>
-                ))
-            )}
-    </StyledWrapper>
-);
+export type InputRef = { toolId: string; element: HTMLElement };
+
+class ToolView extends React.Component<ToolViewProps> {
+    inputRefs: InputRef[] = [];
+
+    componentDidMount() {
+        const { inputRefs } = this.props;
+
+        if (inputRefs) {
+            inputRefs(this.inputRefs);
+        }
+    }
+
+    render() {
+        const { tool, innerRef, onDrag, active, onClick } = this.props;
+
+        return (
+            <StyledWrapper
+                customInnerRef={innerRef}
+                onDragEnd={onDrag}
+                draggable={true}
+                active={active}
+                onClick={onClick}
+                state={tool.state}
+                style={{
+                    left: tool.position.x,
+                    top: tool.position.y,
+                }}
+            >
+                <Header>
+                    <span>{tool.label}</span>
+                    {tool.value != null && <span>&nbsp;[{tool.value}]</span>}
+                </Header>
+                {Object.keys(tool.inputs)
+                    .map(inputName => tool.inputs[inputName])
+                    .map(input =>
+                        input.toolIds.map((toolId, index, arr) => (
+                            <Input key={`${input.name}${toolId}${index}`}>
+                                <InputTarget
+                                    innerRef={element => {
+                                        if (element) {
+                                            this.inputRefs.push({ toolId, element });
+                                        }
+                                    }}
+                                />
+                                {input.name}
+                                {arr.length > 1 && ` [${index}]`}
+                                <InputType>:&nbsp;{input.type.toLowerCase()}</InputType>
+                            </Input>
+                        ))
+                    )}
+            </StyledWrapper>
+        );
+    }
+}
 
 export default ToolView;

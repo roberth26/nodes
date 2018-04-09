@@ -34,7 +34,7 @@ const initialState: State = {
     tools: {
         activeToolId: null,
         byId: {
-            'a': {
+            a: {
                 id: 'a',
                 name: 'CONSTANT',
                 label: 'constant 1',
@@ -42,20 +42,20 @@ const initialState: State = {
                 inputs: {},
                 outputs: ['c'],
                 knobs: {
-                    'value': {
+                    value: {
                         name: 'value',
                         type: 'NUMBER',
-                        value: 5
-                    }
+                        value: 5,
+                    },
                 },
                 position: {
                     x: 50,
-                    y: 50
+                    y: 50,
                 },
                 value: null,
-                outputType: 'NUMBER'
+                outputType: 'NUMBER',
             },
-            'b': {
+            b: {
                 id: 'b',
                 name: 'CONSTANT',
                 label: 'constant 2',
@@ -63,20 +63,20 @@ const initialState: State = {
                 inputs: {},
                 outputs: ['c'],
                 knobs: {
-                    'value': {
+                    value: {
                         name: 'value',
                         type: 'NUMBER',
-                        value: 10
-                    }
+                        value: 10,
+                    },
                 },
                 position: {
                     x: 50,
-                    y: 250
+                    y: 250,
                 },
                 value: null,
-                outputType: 'NUMBER'
+                outputType: 'NUMBER',
             },
-            'c': {
+            c: {
                 id: 'c',
                 name: 'ADD',
                 label: 'add 1',
@@ -86,19 +86,19 @@ const initialState: State = {
                         name: 'operand',
                         toolIds: ['a', 'b'],
                         type: 'NUMBER',
-                        variadic: true
+                        variadic: true,
                     },
                 },
                 outputs: ['f'],
                 knobs: {},
                 position: {
                     x: 400,
-                    y: 120
+                    y: 120,
                 },
                 value: null,
-                outputType: 'NUMBER'
+                outputType: 'NUMBER',
             },
-            'd': {
+            d: {
                 id: 'd',
                 name: 'CONSTANT',
                 label: 'constant 3',
@@ -109,38 +109,38 @@ const initialState: State = {
                     value: {
                         name: 'value',
                         type: 'NUMBER',
-                        value: 8
-                    }
+                        value: 8,
+                    },
                 },
                 position: {
                     x: 400,
-                    y: 50
+                    y: 50,
                 },
                 value: null,
-                outputType: 'NUMBER'
+                outputType: 'NUMBER',
             },
-            'e': {
+            e: {
                 id: 'e',
                 name: 'CONSTANT',
                 label: 'constant 4',
                 state: 'PENDING',
                 inputs: {},
-                outputs: ['f'],
+                outputs: ['f', 'f'],
                 knobs: {
                     value: {
                         name: 'value',
                         type: 'NUMBER',
-                        value: 20
-                    }
+                        value: 20,
+                    },
                 },
                 position: {
                     x: 400,
-                    y: 250
+                    y: 250,
                 },
                 value: null,
-                outputType: 'NUMBER'
+                outputType: 'NUMBER',
             },
-            'f': {
+            f: {
                 id: 'f',
                 name: 'ADD',
                 label: 'add 2',
@@ -149,43 +149,38 @@ const initialState: State = {
                     operand: {
                         name: 'operand',
                         type: 'NUMBER',
-                        toolIds: ['d', 'e', 'c'],
-                        variadic: true
-                    }
+                        toolIds: ['d', 'c', 'e', 'e'],
+                        variadic: true,
+                    },
                 },
                 outputs: [],
                 knobs: {},
                 position: {
                     x: 750,
-                    y: 100
+                    y: 100,
                 },
                 value: null,
-                outputType: 'NUMBER'
-            }
-        }
-    }
+                outputType: 'NUMBER',
+            },
+        },
+    },
 };
 
 const sagaMiddleware = createMiddleware();
 
-const composeEnhancers = process.env.NODE_ENV !== 'production' && window['__REDUX_DEVTOOLS_EXTENSION__'] != null
-    ? window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__']
-    : compose;
+const composeEnhancers =
+    process.env.NODE_ENV !== 'production' && window['__REDUX_DEVTOOLS_EXTENSION__'] != null
+        ? window['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__']
+        : compose;
 
-const enhancer = composeEnhancers(
-    applyMiddleware(sagaMiddleware)
-);
+const enhancer = composeEnhancers(applyMiddleware(sagaMiddleware));
 
 const rootReducer = combineReducers({
     tools: toolsReducer,
-    log: logReducer
+    log: logReducer,
 });
 
-const store = createStore(
-    rootReducer,
-    initialState,
-    enhancer
-);
+const store = createStore(rootReducer, initialState, enhancer);
 
 sagaMiddleware.run(rootSaga);
 
